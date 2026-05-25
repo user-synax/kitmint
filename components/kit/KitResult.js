@@ -161,6 +161,15 @@ export default function KitResult({ kit: initialKit }) {
         </div>
       )}
 
+      {isPro && isOwner && (
+        <div className="mb-8 bg-[#14532D1A] border border-primary/20 rounded-lg p-3 flex items-center justify-center gap-2">
+          <Sparkles className="w-4 h-4 text-primary" />
+          <p className="text-xs font-medium text-primary-text">
+            Refresh individual blocks anytime to get fresh, tailored data
+          </p>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-8 lg:gap-12">
         
         <div className="space-y-12">
