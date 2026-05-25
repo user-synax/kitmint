@@ -7,6 +7,8 @@ import { LayoutGrid, GalleryVertical, Settings, LogOut, ShieldCheck } from 'luci
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import Image from 'next/image';
+import { cn } from '@/lib/utils';
 
 const navItems = [
   { label: 'Dashboard', href: '/dashboard', icon: LayoutGrid },
@@ -26,10 +28,20 @@ export default function Sidebar({ user }) {
     <aside className="w-56 flex-shrink-0 bg-[#111111] border-r border-[#111827] h-full flex flex-col">
       {/* Top: Logo */}
       <div className="p-6">
-        <Link href="/" className="flex items-center gap-1 group">
-          <span className="text-primary font-extrabold text-lg tracking-tight">Kit</span>
-          <span className="text-[#4ADE80] font-extrabold text-lg tracking-tight">Mint</span>
-          <span className="w-1.5 h-1.5 rounded-full bg-[#16A34A] mt-1" />
+        <Link href="/" className="flex items-center gap-2 group">
+          <div className="relative w-7 h-7">
+            <Image 
+              src="/logo.svg" 
+              alt="KitMint Logo" 
+              fill 
+              className="object-contain"
+            />
+          </div>
+          <div className="flex items-center gap-1">
+            <span className="text-primary font-extrabold text-lg tracking-tight">Kit</span>
+            <span className="text-[#4ADE80] font-extrabold text-lg tracking-tight">Mint</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-[#16A34A] mt-1" />
+          </div>
         </Link>
       </div>
 
@@ -92,7 +104,15 @@ export default function Sidebar({ user }) {
           </Avatar>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-text-primary truncate">{user.name}</p>
-            <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-4 bg-primary-muted text-primary-text border-primary/20 capitalize">
+            <Badge 
+              variant="outline" 
+              className={cn(
+                "text-[10px] px-1.5 py-0 h-4 capitalize font-medium",
+                user.plan === 'pro' 
+                  ? "bg-[#14532D] text-[#4ADE80] border-[#16A34A]/50 animate-unlimited-glow" 
+                  : "bg-primary-muted text-primary-text border-primary/20"
+              )}
+            >
               {user.plan}
             </Badge>
           </div>
