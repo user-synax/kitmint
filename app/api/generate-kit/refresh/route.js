@@ -48,7 +48,6 @@ export async function POST(req) {
     try {
       refreshedData = JSON.parse(content);
     } catch (e) {
-      console.error("Failed to parse Groq response:", content);
       return NextResponse.json({ error: "Refresh failed, please try again" }, { status: 500 });
     }
 
@@ -65,7 +64,6 @@ export async function POST(req) {
     }, { status: 200 });
 
   } catch (error) {
-    console.error("Block refresh error:", error);
     return NextResponse.json({ error: "Something went wrong. Please try again." }, { status: 500 });
   }
 }
