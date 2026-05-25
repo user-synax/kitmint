@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { Plus, MoreVertical, Eye, Globe, Lock, Trash2, LayoutGrid, List } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
+import { Badge } from '@/components/ui/badge';
 import {
   DropdownMenu,
   DropdownMenuContent,

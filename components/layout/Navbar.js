@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from '@/components/ui/sheet';
-import { Menu, LayoutGrid, Settings, LogOut, Home } from 'lucide-react';
+import { Menu, LayoutGrid, Settings, LogOut, Home, ShieldCheck } from 'lucide-react';
 import Image from 'next/image';
 
 const NavLinks = ({ className, activePath }) => (
@@ -33,6 +33,7 @@ export default function Navbar() {
   const { data: session, status } = useSession();
   const pathname = usePathname();
   const isLoading = status === 'loading';
+  const isAdmin = session?.user?.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL;
 
   return (
     <nav className="sticky top-0 z-50 h-14 w-full bg-[#0A0A0A]/80 backdrop-blur-md border-b border-[#111827]">
@@ -95,6 +96,14 @@ export default function Navbar() {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56 bg-surface border-border">
+                  {isAdmin && (
+                    <DropdownMenuItem asChild className="cursor-pointer hover:bg-surface-2 text-primary-text font-medium">
+                      <Link href="/admin/users" className="flex items-center">
+                        <ShieldCheck className="w-4 h-4 mr-2" />
+                        Admin Panel
+                      </Link>
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuItem asChild className="cursor-pointer hover:bg-surface-2">
                     <Link href="/dashboard">Dashboard</Link>
                   </DropdownMenuItem>
@@ -138,6 +147,11 @@ export default function Navbar() {
                   
                   {session ? (
                     <>
+                      {isAdmin && (
+                        <Link href="/admin/users" className={`flex items-center gap-3 text-sm ${pathname === '/admin/users' ? 'text-primary' : 'text-text-secondary'}`}>
+                          <ShieldCheck className="w-4 h-4" /> Admin Panel
+                        </Link>
+                      )}
                       <Link href="/dashboard" className={`flex items-center gap-3 text-sm ${pathname === '/dashboard' ? 'text-primary' : 'text-text-secondary'}`}>
                         <LayoutGrid className="w-4 h-4" /> Dashboard
                       </Link>
