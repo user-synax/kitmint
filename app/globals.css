@@ -1,26 +1,128 @@
-@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --primary:        #16A34A;
+  --primary-hover:  #15803D;
+  --primary-muted:  #14532D1A;
+  --primary-text:   #4ADE80;
+
+  --background:     #0A0A0A;
+  --surface:        #111111;
+  --surface-2:      #1A1A1A;
+  --surface-3:      #222222;
+
+  --text-primary:   #F9FAFB;
+  --text-secondary: #9CA3AF;
+  --text-muted:     #6B7280;
+
+  --border:         #1F2937;
+  --border-muted:   #111827;
+  --border-active:  #16A34A;
+
+  --success:        #16A34A;
+  --warning:        #D97706;
+  --warning-bg:     #D977061A;
+  --error:          #DC2626;
+  --error-bg:       #DC26261A;
+
+  --secondary:      #4B5563;
+  --neutral:        #9CA3AF;
+
+  --font-sans: 'DM Sans', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* shadcn mapping */
+  --foreground: 0 0% 98%;
+  --card: 0 0% 7%; /* --surface */
+  --card-foreground: 0 0% 98%;
+  --popover: 0 0% 7%; /* --surface */
+  --popover-foreground: 0 0% 98%;
+  --primary-foreground: 0 0% 100%;
+  --secondary-foreground: 0 0% 98%;
+  --muted: 0 0% 10%; /* --surface-2 */
+  --muted-foreground: 215 16% 65%; /* --text-secondary */
+  --accent: 0 0% 10%; /* --surface-2 */
+  --accent-foreground: 0 0% 98%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 0 0% 98%;
+  --input: 215 28% 17%; /* --surface-3 */
+  --ring: 142.1 76.2% 36.3%; /* --primary */
+  --radius: 0.5rem;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* Dark mode mapping (since the app is dark by default) */
+.dark {
+  --background: 0 0% 4%;
+  --foreground: 0 0% 98%;
+  --card: 0 0% 7%;
+  --card-foreground: 0 0% 98%;
+  --popover: 0 0% 7%;
+  --popover-foreground: 0 0% 98%;
+  --primary: 142.1 76.2% 36.3%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 215 28% 17%;
+  --secondary-foreground: 0 0% 98%;
+  --muted: 0 0% 10%;
+  --muted-foreground: 215 16% 65%;
+  --accent: 0 0% 10%;
+  --accent-foreground: 0 0% 98%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 215 28% 17%;
+  --input: 215 28% 17%;
+  --ring: 142.1 76.2% 36.3%;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  border-color: var(--border);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--background);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse-glow {
+  0% { opacity: 0.2; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.01); }
+  100% { opacity: 0.2; transform: scale(1); }
+}
+
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.animate-multi-color-glow {
+  background: linear-gradient(
+    45deg,
+    #D32F2F, /* Angry Tomato */
+    #4CAF50, /* Matt Green */
+    #FFC107, /* Marigold */
+    #2196F3, /* Fresh Blue of Bel Air */
+    #424242, /* Black Panther */
+    #F5F5F5  /* White Smoke */
+  );
+  background-size: 300% 300%;
+  animation: gradient-shift 8s ease infinite, pulse-glow 4s ease-in-out infinite;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease forwards;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s infinite ease-in-out;
 }
