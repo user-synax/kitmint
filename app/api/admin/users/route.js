@@ -29,7 +29,6 @@ export async function GET() {
 
     return NextResponse.json(usersWithCredits);
   } catch (error) {
-    console.error('Admin Users GET Error:', error);
     return NextResponse.json({ error: 'Failed to fetch users' }, { status: 500 });
   }
 }
@@ -67,7 +66,6 @@ export async function PATCH(req) {
       }
     });
   } catch (error) {
-    console.error('Admin Users PATCH Error:', error);
     return NextResponse.json({ error: 'Failed to update user' }, { status: 500 });
   }
 }
