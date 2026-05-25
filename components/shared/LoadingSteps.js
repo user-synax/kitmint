@@ -4,8 +4,11 @@ import { useState, useEffect } from 'react';
 
 const steps = [
   "Naming your brand...",
+  "Defining target personas...",
   "Picking your colors...",
+  "Designing logo concepts...",
   "Writing your copy...",
+  "Drafting social bios...",
   "Crafting your launch story..."
 ];
 
