@@ -181,7 +181,8 @@ export default function KitResult({ kit: initialKit }) {
             </div>
           </section>
 
-          <section>
+          {/* B) BRAND NAMES SECTION */}
+          <section className={cn("transition-opacity", refreshingBlocks.brandNames && "opacity-50")}>
             <SectionLabel blockKey="brandNames">Brand Names</SectionLabel>
             <div className="flex flex-wrap gap-3">
               {kit.brandNames.map((bn, i) => (
@@ -204,7 +205,8 @@ export default function KitResult({ kit: initialKit }) {
             </div>
           </section>
 
-          <section>
+          {/* C) TAGLINE SECTION */}
+          <section className={cn("transition-opacity", refreshingBlocks.tagline && "opacity-50")}>
             <SectionLabel blockKey="tagline">Tagline</SectionLabel>
             <div className="bg-surface border border-border rounded-md p-6 relative">
               <div className="absolute top-4 right-4">
@@ -216,12 +218,14 @@ export default function KitResult({ kit: initialKit }) {
             </div>
           </section>
 
-          <section>
+          {/* D) COLOR PALETTE SECTION */}
+          <section className={cn("transition-opacity", refreshingBlocks.colors && "opacity-50")}>
             <SectionLabel blockKey="colors">Color Palette</SectionLabel>
             <ColorSwatch colors={kit.colors} />
           </section>
 
-          <section>
+          {/* E) TYPOGRAPHY SECTION */}
+          <section className={cn("transition-opacity", refreshingBlocks.fonts && "opacity-50")}>
             <SectionLabel blockKey="fonts">Typography</SectionLabel>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="bg-surface border border-border rounded-md p-5">
@@ -244,7 +248,8 @@ export default function KitResult({ kit: initialKit }) {
             </p>
           </section>
 
-          <section>
+          {/* F) LANDING PAGE COPY */}
+          <section className={cn("transition-opacity", refreshingBlocks.landingCopy && "opacity-50")}>
             <SectionLabel blockKey="landingCopy">Landing Page Copy</SectionLabel>
             <div className="space-y-4">
               {[
@@ -263,7 +268,8 @@ export default function KitResult({ kit: initialKit }) {
             </div>
           </section>
 
-          <section>
+          {/* G) TWITTER THREAD */}
+          <section className={cn("transition-opacity", refreshingBlocks.twitterThread && "opacity-50")}>
             <SectionLabel blockKey="twitterThread">Twitter Thread</SectionLabel>
             <div className="space-y-4">
               {kit?.twitterThread?.map((tweet, i) => (
@@ -290,7 +296,8 @@ export default function KitResult({ kit: initialKit }) {
             </div>
           </section>
 
-          <section>
+          {/* H) PRODUCT HUNT */}
+          <section className={cn("transition-opacity", refreshingBlocks.productHunt && "opacity-50")}>
             <SectionLabel blockKey="productHunt">Product Hunt</SectionLabel>
             <div className="grid grid-cols-1 gap-4">
               <div className="bg-surface border border-border rounded-md p-5 relative">
@@ -314,7 +321,8 @@ export default function KitResult({ kit: initialKit }) {
             </div>
           </section>
 
-          <section>
+          {/* I) PRICING TIERS */}
+          <section className={cn("transition-opacity", refreshingBlocks.pricingCopy && "opacity-50")}>
             <SectionLabel blockKey="pricingCopy">Pricing Copy</SectionLabel>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {[kit?.pricingCopy?.tier1, kit?.pricingCopy?.tier2, kit?.pricingCopy?.tier3].map((tier, i) => (
