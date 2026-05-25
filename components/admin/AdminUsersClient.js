@@ -144,7 +144,7 @@ export default function AdminUsersClient() {
                           ? "border-emerald-500/50 text-emerald-500 bg-emerald-500/5" 
                           : "border-zinc-700 text-zinc-400"}
                       >
-                        {user.plan.toUpperCase()}
+                        {(user.plan || 'free').toUpperCase()}
                       </Badge>
                     </TableCell>
                     <TableCell className="text-center text-zinc-300">
