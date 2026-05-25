@@ -76,18 +76,38 @@ export async function POST(req) {
     try {
       parsedKit = JSON.parse(content);
     } catch (e) {
-      console.error("Failed to parse Groq response:", content);
       return NextResponse.json({ error: "Generation failed, please try again" }, { status: 500 });
     }
 
     // 5. SAVE TO DB
     const slug = nanoid(10);
+    
+    // Normalization & Defaults for new fields with smart fallbacks
+    const finalKitData = {
+      ...parsedKit,
+      userPersonas: (parsedKit.userPersonas?.length > 0) ? parsedKit.userPersonas : 
+                   (parsedKit.personas?.length > 0 ? parsedKit.personas : [
+        { name: "The Busy Student", description: "Balancing exams and life with no time to cook.", painPoint: "Eating junk food due to time constraints." },
+        { name: "The Budget Founder", description: "Looking for high-efficiency, low-cost solutions.", painPoint: "Overspending on basic necessities." }
+      ]),
+      logoPrompts: (parsedKit.logoPrompts?.length > 0) ? parsedKit.logoPrompts : 
+                  (parsedKit.logo_prompts?.length > 0 ? parsedKit.logo_prompts : [
+        "A minimalist, high-contrast logo representing " + idea,
+        "A modern, tech-forward brand mark for " + idea
+      ]),
+      socialBios: parsedKit.socialBios || parsedKit.social_bios || { 
+        instagram: parsedKit.instagramBio || "Transforming how you think about " + idea + " 🚀", 
+        tiktok: parsedKit.tiktokBio || "The future of " + idea + " is here. ⚡", 
+        twitter: parsedKit.twitterBio || "Building the next generation of " + idea + ". Join us! 🚀" 
+      }
+    };
+
     const newKit = new Kit({
       slug,
       userId: session?.user?.id || null,
       isPublic: false,
       ideaPrompt: idea,
-      ...parsedKit
+      ...finalKitData
     });
     await newKit.save();
 
@@ -108,12 +128,11 @@ export async function POST(req) {
     // 7. RETURN
     return NextResponse.json({ 
       slug, 
-      kit: parsedKit,
+      kit: newKit,
       updatedKitsCount // Return this so the frontend can update session
     }, { status: 201 });
 
   } catch (error) {
-    console.error("Kit generation error:", error);
     return NextResponse.json({ error: "Something went wrong. Please try again." }, { status: 500 });
   }
 }
