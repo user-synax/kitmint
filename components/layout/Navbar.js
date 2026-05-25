@@ -14,6 +14,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from '@/components/ui/sheet';
 import { Menu, LayoutGrid, Settings, LogOut, Home } from 'lucide-react';
+import Image from 'next/image';
 
 const NavLinks = ({ className, activePath }) => (
   <div className={className}>
@@ -37,10 +38,21 @@ export default function Navbar() {
     <nav className="sticky top-0 z-50 h-14 w-full bg-[#0A0A0A]/80 backdrop-blur-md border-b border-[#111827]">
       <div className="max-w-[1200px] mx-auto h-full px-4 md:px-6 lg:px-8 flex items-center justify-between">
         <div className="flex items-center gap-8">
-          <Link href="/" className="flex items-center gap-1 group">
-            <span className="text-primary font-extrabold text-xl tracking-tight">Kit</span>
-            <span className="text-[#4ADE80] font-extrabold text-xl tracking-tight">Mint</span>
-            <span className="w-1.5 h-1.5 rounded-full bg-[#16A34A] mt-1" />
+          <Link href="/" className="flex items-center gap-2 group">
+            <div className="relative w-8 h-8 transition-transform duration-300 group-hover:scale-110">
+              <Image 
+                src="/logo.svg" 
+                alt="KitMint Logo" 
+                fill 
+                className="object-contain"
+                priority
+              />
+            </div>
+            <div className="flex items-center gap-1">
+              <span className="text-primary font-extrabold text-xl tracking-tight">Kit</span>
+              <span className="text-[#4ADE80] font-extrabold text-xl tracking-tight">Mint</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-[#16A34A] mt-1" />
+            </div>
           </Link>
 
           <NavLinks className="hidden md:flex items-center gap-6" activePath={pathname} />
@@ -58,9 +70,16 @@ export default function Navbar() {
             </div>
           ) : (
             <div className="hidden md:flex items-center gap-4">
-              {session.user.plan === 'free' && (
+              {session.user.plan === 'free' ? (
                 <Badge variant="outline" className="bg-primary-muted text-primary-text border-primary/20 font-medium">
                   {Math.max(0, 3 - (session.user.kitsGeneratedThisMonth || 0))} kits left
+                </Badge>
+              ) : (
+                <Badge 
+                  variant="outline" 
+                  className="bg-[#14532D] text-[#4ADE80] border-[#16A34A]/50 font-bold animate-unlimited-glow px-3"
+                >
+                  Unlimited Kits
                 </Badge>
               )}
               
