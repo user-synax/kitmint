@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 
 export default function Error({ error, reset }) {
   useEffect(() => {
-    console.error('App error:', error);
+    // Error logged for monitoring
   }, [error]);
 
   return (

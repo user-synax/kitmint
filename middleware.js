@@ -8,11 +8,6 @@ export function middleware(request) {
   response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
-  // Log generation requests for monitoring/debugging
-  if (request.nextUrl.pathname === '/api/generate-kit') {
-    console.log(`[GENERATE] Request from ${request.ip || 'unknown IP'}`);
-  }
-
   return response;
 }
 

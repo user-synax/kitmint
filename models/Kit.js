@@ -24,11 +24,20 @@ const KitSchema = new mongoose.Schema({
   pricingCopy: { tier1: String, tier2: String, tier3: String },
   twitterThread: [String],
   productHunt: { tagline: String, description: String },
+  userPersonas: [{ name: String, description: String, painPoint: String }],
+  logoPrompts: [String],
+  socialBios: { instagram: String, tiktok: String, twitter: String },
   views: { type: Number, default: 0 },
   createdAt: { type: Date, default: Date.now }
-});
+}, { strict: false });
 
 KitSchema.index({ isPublic: 1, createdAt: -1 });
 KitSchema.index({ userId: 1 });
 
-export default mongoose.models.Kit || mongoose.model('Kit', KitSchema);
+// Clear the model from cache to ensure schema changes are picked up during development
+if (mongoose.models.Kit) {
+  delete mongoose.models.Kit;
+}
+
+const Kit = mongoose.model('Kit', KitSchema);
+export default Kit;
