@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
-import { Copy, Check, Share2, Eye, Calendar, Globe, Lock, Sparkles } from 'lucide-react';
+import { Copy, Check, Share2, Eye, Calendar, Globe, Lock, RefreshCcw, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -10,6 +10,7 @@ import { Separator } from '@/components/ui/separator';
 import ColorSwatch from './ColorSwatch';
 import Link from 'next/link';
 import Image from 'next/image';
+import { cn } from '@/lib/utils';
 
 const CopyIcon = ({ text, label }) => {
   const [copied, setCopied] = useState(false);
@@ -37,9 +38,40 @@ export default function KitResult({ kit: initialKit }) {
   const [kit, setKit] = useState(initialKit);
   const [selectedNameIndex, setSelectedNameIndex] = useState(0);
   const [isPublishing, setIsPublishing] = useState(false);
+  const [refreshingBlocks, setRefreshingBlocks] = useState({});
 
   const isOwner = session?.user?.id === kit.userId;
+  const isPro = session?.user?.plan === 'pro';
   const isFree = session?.user?.plan === 'free' || !session;
+
+  const handleRefreshBlock = async (blockKey) => {
+    if (!isPro) {
+      toast.error('Refreshing individual blocks is a Pro feature.');
+      return;
+    }
+
+    setRefreshingBlocks(prev => ({ ...prev, [blockKey]: true }));
+    try {
+      const res = await fetch('/api/generate-kit/refresh', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ kitId: kit._id, blockKey }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || 'Refresh failed');
+      }
+
+      const data = await res.json();
+      setKit(prev => ({ ...prev, [blockKey]: data.refreshedData }));
+      toast.success(`Refreshed ${blockKey} successfully!`);
+    } catch (error) {
+      toast.error(error.message);
+    } finally {
+      setRefreshingBlocks(prev => ({ ...prev, [blockKey]: false }));
+    }
+  };
 
   const handlePublish = async () => {
     if (!session) {
