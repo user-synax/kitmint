@@ -36,6 +36,8 @@ export default function DashboardClient({ kits: initialKits, user }) {
   const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'list'
   const router = useRouter();
 
+  if (!user) return null;
+
   const used = user.kitsGeneratedThisMonth || 0;
   const limit = 3;
   const progress = (used / limit) * 100;
