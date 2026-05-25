@@ -29,23 +29,6 @@ const CopyIcon = ({ text, label }) => {
   );
 };
 
-const SectionLabel = ({ children, blockKey }) => (
-    <div className="flex items-center justify-between mb-3">
-      <p className="text-xs font-500 text-[#6B7280] uppercase tracking-widest">{children}</p>
-      {isPro && isOwner && blockKey && (
-        <button 
-          onClick={() => handleRefreshBlock(blockKey)}
-          disabled={refreshingBlocks[blockKey]}
-          className="flex items-center gap-1.5 text-[10px] font-medium text-primary hover:text-primary-hover transition-colors disabled:opacity-50"
-          title="Refresh this block"
-        >
-          <RefreshCcw className={cn("w-3 h-3", refreshingBlocks[blockKey] && "animate-spin")} />
-          {refreshingBlocks[blockKey] ? 'Refreshing...' : 'Refresh'}
-        </button>
-      )}
-    </div>
-  );
-
 export default function KitResult({ kit: initialKit }) {
   const { data: session } = useSession();
   const [kit, setKit] = useState(initialKit);
@@ -85,6 +68,23 @@ export default function KitResult({ kit: initialKit }) {
       setRefreshingBlocks(prev => ({ ...prev, [blockKey]: false }));
     }
   };
+
+  const SectionLabel = ({ children, blockKey }) => (
+    <div className="flex items-center justify-between mb-3">
+      <p className="text-xs font-500 text-[#6B7280] uppercase tracking-widest">{children}</p>
+      {isPro && isOwner && blockKey && (
+        <button 
+          onClick={() => handleRefreshBlock(blockKey)}
+          disabled={refreshingBlocks[blockKey]}
+          className="flex items-center gap-1.5 text-[10px] font-medium text-primary hover:text-primary-hover transition-colors disabled:opacity-50"
+          title="Refresh this block"
+        >
+          <RefreshCcw className={cn("w-3 h-3", refreshingBlocks[blockKey] && "animate-spin")} />
+          {refreshingBlocks[blockKey] ? 'Refreshing...' : 'Refresh'}
+        </button>
+      )}
+    </div>
+  );
 
   const handlePublish = async () => {
     if (!session) {
