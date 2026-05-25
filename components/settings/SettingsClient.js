@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useSession } from 'next-auth/react';
-import { User, CreditCard, CheckCircle2, Calendar, Save, ShieldCheck } from 'lucide-react';
+import { User, CreditCard, CheckCircle2, Calendar, Save, ShieldCheck, Ticket, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,12 +11,45 @@ import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
-export default function SettingsClient({ user }) {
+export default function SettingsClient({ user: initialUser }) {
   const { update } = useSession();
-  const [name, setName] = useState(user.name || '');
+  const [user, setUser] = useState(initialUser);
+  const [name, setName] = useState(user?.name || '');
   const [passwords, setPasswords] = useState({ current: '', new: '' });
   const [isUpdatingName, setIsUpdatingName] = useState(false);
   const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
+  const [promoCode, setPromoCode] = useState('');
+  const [isApplyingPromo, setIsApplyingPromo] = useState(false);
+
+  if (!user) return null;
+
+  const handleApplyPromo = async (e) => {
+    e.preventDefault();
+    if (!promoCode.trim()) return;
+
+    setIsApplyingPromo(true);
+    try {
+      const res = await fetch('/api/user/apply-promo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: promoCode.trim().toUpperCase() }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to apply promo');
+
+      toast.success(data.message);
+      setPromoCode('');
+      // Update local state and session
+      const updatedUser = { ...user, plan: 'pro', subscription: data.subscription };
+      setUser(updatedUser);
+      await update({ plan: 'pro', subscription: data.subscription });
+    } catch (error) {
+      toast.error(error.message);
+    } finally {
+      setIsApplyingPromo(false);
+    }
+  };
 
   const handleUpdateName = async (e) => {
     e.preventDefault();
@@ -183,54 +216,106 @@ export default function SettingsClient({ user }) {
             <div className="bg-primary/5 border-b border-primary/10 p-5 sm:p-6 flex justify-between items-center">
               <div>
                 <p className="text-xs font-medium text-primary-text uppercase tracking-widest mb-1">Current Plan</p>
-                <h3 className="text-xl sm:text-2xl font-bold text-text-primary capitalize">{user.plan}</h3>
+                <div className="flex items-center gap-2">
+                  <h3 className="text-xl sm:text-2xl font-bold text-text-primary capitalize">{user.plan}</h3>
+                  {user.subscription?.status === 'active' && (
+                    <Badge variant="outline" className="text-[10px] border-primary/30 text-primary-text capitalize">
+                      {user.subscription.tier}
+                    </Badge>
+                  )}
+                </div>
               </div>
-              <Badge className="bg-primary text-white px-3 py-1">
-                {user.plan === 'free' ? 'Active' : 'Premium'}
+              <Badge className={cn(
+                "px-3 py-1",
+                user.plan === 'pro' ? "bg-emerald-600 text-white" : "bg-zinc-800 text-zinc-400"
+              )}>
+                {user.plan === 'pro' ? 'Premium' : 'Free'}
               </Badge>
             </div>
             <CardContent className="p-5 sm:p-6 space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="space-y-4">
-                  <p className="text-xs font-medium text-text-secondary uppercase tracking-wider">Usage this month</p>
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-3xl font-bold text-text-primary">{user.kitsGeneratedThisMonth || 0}</span>
-                    <span className="text-text-muted">/ {user.plan === 'free' ? '3' : 'Unlimited'} kits</span>
+                <div className="space-y-6">
+                  <div className="space-y-4">
+                    <p className="text-xs font-medium text-text-secondary uppercase tracking-wider">Usage this month</p>
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-3xl font-bold text-text-primary">{user.kitsGeneratedThisMonth || 0}</span>
+                      <span className="text-text-muted">/ {user.plan === 'free' ? '3' : 'Unlimited'} kits</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-[11px] text-text-muted">
+                      <Calendar className="w-3.5 h-3.5" />
+                      Resets on {new Date(user.monthResetDate).toLocaleDateString()}
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2 text-[11px] text-text-muted mt-2">
-                    <Calendar className="w-3.5 h-3.5" />
-                    Resets on {new Date(user.monthResetDate).toLocaleDateString()}
-                  </div>
+
+                  {user.subscription?.endDate && user.plan === 'pro' && (
+                    <div className="p-4 rounded-xl bg-surface-2 border border-border space-y-2">
+                      <p className="text-[10px] text-text-muted uppercase font-bold">Subscription Ends</p>
+                      <p className="text-sm text-text-primary font-medium">
+                        {new Date(user.subscription.endDate).toLocaleDateString('en-US', { 
+                          year: 'numeric', month: 'long', day: 'numeric' 
+                        })}
+                      </p>
+                    </div>
+                  )}
                 </div>
 
-                {user.plan === 'free' && (
-                  <div className="bg-surface-2 border border-border rounded-xl p-5 flex flex-col justify-center relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 p-3">
-                      <Badge className="bg-primary/20 text-primary-text border-none text-[10px]">UPGRADE</Badge>
+                <div className="space-y-6">
+                  {user.plan === 'free' && (
+                    <div className="bg-surface-2 border border-border rounded-xl p-5 flex flex-col justify-center relative overflow-hidden group">
+                      <div className="absolute top-0 right-0 p-3">
+                        <Badge className="bg-primary/20 text-primary-text border-none text-[10px]">PRO</Badge>
+                      </div>
+                      <h4 className="font-bold text-text-primary mb-3 flex items-center gap-2">
+                        <ShieldCheck className="w-4 h-4 text-primary" />
+                        Pro Benefits
+                      </h4>
+                      <ul className="text-xs text-text-secondary space-y-2.5">
+                        <li className="flex items-center gap-2">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-primary" />
+                          Unlimited brand kits
+                        </li>
+                        <li className="flex items-center gap-2">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-primary" />
+                          Premium AI models & logic
+                        </li>
+                        <li className="flex items-center gap-2">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-primary" />
+                          Block-level kit refreshing
+                        </li>
+                        <li className="flex items-center gap-2">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-primary" />
+                          PDF Export feature
+                        </li>
+                      </ul>
                     </div>
-                    <h4 className="font-bold text-text-primary mb-3 flex items-center gap-2">
-                      <ShieldCheck className="w-4 h-4 text-primary" />
-                      Pro Benefits
-                    </h4>
-                    <ul className="text-xs text-text-secondary space-y-2.5">
-                      <li className="flex items-center gap-2">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-primary" />
-                        Unlimited brand kits
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-primary" />
-                        Premium AI models & logic
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-primary" />
-                        Block-level kit refreshing
-                      </li>
-                    </ul>
-                    <Button className="mt-5 w-full bg-primary hover:bg-primary-hover text-white font-bold h-10 touch-target-mobile">
-                      Coming Soon
-                    </Button>
+                  )}
+
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2 text-text-primary">
+                      <Ticket className="w-4 h-4 text-emerald-500" />
+                      <h4 className="font-bold">Have a Promo Code?</h4>
+                    </div>
+                    <form onSubmit={handleApplyPromo} className="flex gap-2">
+                      <Input 
+                        placeholder="ENTER CODE" 
+                        value={promoCode}
+                        onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
+                        className="bg-surface-3 border-border uppercase font-mono h-11"
+                        disabled={isApplyingPromo}
+                      />
+                      <Button 
+                        type="submit" 
+                        disabled={isApplyingPromo || !promoCode.trim()}
+                        className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold h-11 px-6"
+                      >
+                        {isApplyingPromo ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Apply'}
+                      </Button>
+                    </form>
+                    <p className="text-[10px] text-text-muted">
+                      Redeem a promo code to unlock Premium features instantly.
+                    </p>
                   </div>
-                )}
+                </div>
               </div>
             </CardContent>
           </Card>
