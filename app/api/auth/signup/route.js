@@ -2,22 +2,21 @@ import connectDB from "@/lib/db";
 import User from "@/models/User";
 import bcrypt from "bcryptjs";
 import { NextResponse } from "next/server";
+import { validateName, validateEmail, validatePassword } from "@/lib/validation";
 
 export async function POST(req) {
   try {
     const { name, email, password } = await req.json();
 
-    // Validate input
-    if (!name || name.length < 2) {
-      return NextResponse.json({ error: "Name must be at least 2 characters" }, { status: 400 });
-    }
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!email || !emailRegex.test(email)) {
-      return NextResponse.json({ error: "Invalid email format" }, { status: 400 });
-    }
-    if (!password || password.length < 8) {
-      return NextResponse.json({ error: "Password must be at least 8 characters" }, { status: 400 });
-    }
+    // Validate input using shared logic
+    const nameError = validateName(name);
+    if (nameError) return NextResponse.json({ error: nameError }, { status: 400 });
+
+    const emailError = validateEmail(email);
+    if (emailError) return NextResponse.json({ error: emailError }, { status: 400 });
+
+    const passwordError = validatePassword(password);
+    if (passwordError) return NextResponse.json({ error: passwordError }, { status: 400 });
 
     await connectDB();
 
