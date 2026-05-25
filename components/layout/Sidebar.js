@@ -20,15 +20,15 @@ const adminItems = [
   { label: 'Admin Panel', href: '/admin/users', icon: ShieldCheck },
 ];
 
-export default function Sidebar({ user }) {
+export default function Sidebar({ user, isMobile, onLinkClick }) {
   const pathname = usePathname();
   const isAdmin = user?.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL;
 
-  return (
-    <aside className="w-56 flex-shrink-0 bg-[#111111] border-r border-[#111827] h-full flex flex-col">
+  const NavContent = () => (
+    <>
       {/* Top: Logo */}
       <div className="p-6">
-        <Link href="/" className="flex items-center gap-2 group">
+        <Link href="/" className="flex items-center gap-2 group" onClick={onLinkClick}>
           <div className="relative w-7 h-7">
             <Image 
               src="/logo.svg" 
@@ -54,13 +54,15 @@ export default function Sidebar({ user }) {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-md text-sm transition-colors duration-150 ${
+              onClick={onLinkClick}
+              className={cn(
+                "flex items-center gap-3 px-3 py-3 md:py-2.5 rounded-md text-sm transition-colors duration-150",
                 isActive
                   ? 'bg-[#1A1A1A] text-[#F9FAFB] border-r-2 border-[#16A34A]'
                   : 'text-[#9CA3AF] hover:text-[#F9FAFB] hover:bg-[#1A1A1A]'
-              }`}
+              )}
             >
-              <Icon className={`w-4 h-4 ${isActive ? 'text-primary' : ''}`} />
+              <Icon className={cn("w-4 h-4", isActive ? 'text-primary' : '')} />
               {item.label}
             </Link>
           );
@@ -78,13 +80,15 @@ export default function Sidebar({ user }) {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`flex items-center gap-3 px-3 py-2.5 rounded-md text-sm transition-colors duration-150 ${
+                  onClick={onLinkClick}
+                  className={cn(
+                    "flex items-center gap-3 px-3 py-3 md:py-2.5 rounded-md text-sm transition-colors duration-150",
                     isActive
                       ? 'bg-[#1A1A1A] text-[#F9FAFB] border-r-2 border-[#16A34A]'
                       : 'text-[#9CA3AF] hover:text-[#F9FAFB] hover:bg-[#1A1A1A]'
-                  }`}
+                  )}
                 >
-                  <Icon className={`w-4 h-4 ${isActive ? 'text-primary' : ''}`} />
+                  <Icon className={cn("w-4 h-4", isActive ? 'text-primary' : '')} />
                   {item.label}
                 </Link>
               );
@@ -98,35 +102,35 @@ export default function Sidebar({ user }) {
         <div className="flex items-center gap-3">
           <Avatar className="h-9 w-9 border border-border">
             <AvatarImage src={user.image} alt={user.name} />
-            <AvatarFallback className="bg-surface-2 text-text-primary text-xs">
+            <AvatarFallback className="bg-[#1A1A1A] text-[#F9FAFB]">
               {user.name?.charAt(0)}
             </AvatarFallback>
           </Avatar>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-text-primary truncate">{user.name}</p>
-            <Badge 
-              variant="outline" 
-              className={cn(
-                "text-[10px] px-1.5 py-0 h-4 capitalize font-medium",
-                user.plan === 'pro' 
-                  ? "bg-[#14532D] text-[#4ADE80] border-[#16A34A]/50 animate-unlimited-glow" 
-                  : "bg-primary-muted text-primary-text border-primary/20"
-              )}
-            >
-              {user.plan}
-            </Badge>
+            <p className="text-sm font-medium text-[#F9FAFB] truncate">{user.name}</p>
+            <p className="text-xs text-[#6B7280] truncate capitalize">{user.plan} Plan</p>
           </div>
         </div>
-        
+
         <Button 
           variant="ghost" 
           onClick={() => signOut({ callbackUrl: '/' })}
-          className="w-full justify-start gap-3 text-text-muted hover:text-error hover:bg-error/10 h-9 px-3"
+          className="w-full flex items-center justify-start gap-3 px-3 py-2 text-[#9CA3AF] hover:text-[#F9FAFB] hover:bg-[#1A1A1A] h-auto font-normal"
         >
           <LogOut className="w-4 h-4" />
-          <span className="text-sm">Sign out</span>
+          Sign Out
         </Button>
       </div>
+    </>
+  );
+
+  if (isMobile) {
+    return <NavContent />;
+  }
+
+  return (
+    <aside className="w-56 flex-shrink-0 bg-[#111111] border-r border-[#111827] h-full flex flex-col">
+      <NavContent />
     </aside>
   );
 }
