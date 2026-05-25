@@ -2,13 +2,14 @@
 
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
-import { Copy, Check, Share2, Eye, Calendar, Globe, Lock } from 'lucide-react';
+import { Copy, Check, Share2, Eye, Calendar, Globe, Lock, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import ColorSwatch from './ColorSwatch';
 import Link from 'next/link';
+import Image from 'next/image';
 
 const CopyIcon = ({ text, label }) => {
   const [copied, setCopied] = useState(false);
@@ -38,6 +39,7 @@ export default function KitResult({ kit: initialKit }) {
   const [isPublishing, setIsPublishing] = useState(false);
 
   const isOwner = session?.user?.id === kit.userId;
+  const isFree = session?.user?.plan === 'free' || !session;
 
   const handlePublish = async () => {
     if (!session) {
@@ -79,7 +81,6 @@ export default function KitResult({ kit: initialKit }) {
           url: shareUrl,
         });
       } catch (err) {
-        // Fallback to copy if user cancels or share fails
         navigator.clipboard.writeText(shareUrl);
         toast.success('Link copied to clipboard!');
       }
@@ -97,12 +98,28 @@ export default function KitResult({ kit: initialKit }) {
 
   return (
     <div className="max-w-[1200px] mx-auto px-4 md:px-6 lg:px-8 pt-8 pb-16 animate-fade-in">
+      {/* FREE USER BADGE */}
+      {isFree && (
+        <div className="mb-8 bg-surface-2 border border-border rounded-lg p-4 flex items-center justify-between group">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+              <Sparkles className="w-5 h-5 text-primary" />
+            </div>
+            <div>
+              <p className="text-sm font-bold text-text-primary">Free Brand Kit</p>
+              <p className="text-xs text-text-secondary">Upgrade to Pro for unlimited kits and block-level refreshing.</p>
+            </div>
+          </div>
+          <Button asChild size="sm" className="bg-primary hover:bg-primary-hover text-white font-semibold">
+            <Link href="/settings">Upgrade to Pro</Link>
+          </Button>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-8 lg:gap-12">
         
-        {/* LEFT COLUMN */}
         <div className="space-y-12">
           
-          {/* A) HEADER SECTION */}
           <section>
             <p className="text-xs font-500 text-[#4ADE80] uppercase tracking-widest mb-3">Generated Kit</p>
             <div className="border-l-2 border-[#16A34A] pl-4">
@@ -110,7 +127,6 @@ export default function KitResult({ kit: initialKit }) {
             </div>
           </section>
 
-          {/* B) BRAND NAMES SECTION */}
           <section>
             <SectionLabel>Brand Names</SectionLabel>
             <div className="flex flex-wrap gap-3">
@@ -134,7 +150,6 @@ export default function KitResult({ kit: initialKit }) {
             </div>
           </section>
 
-          {/* C) TAGLINE SECTION */}
           <section>
             <SectionLabel>Tagline</SectionLabel>
             <div className="bg-surface border border-border rounded-md p-6 relative">
@@ -147,13 +162,11 @@ export default function KitResult({ kit: initialKit }) {
             </div>
           </section>
 
-          {/* D) COLOR PALETTE SECTION */}
           <section>
             <SectionLabel>Color Palette</SectionLabel>
             <ColorSwatch colors={kit.colors} />
           </section>
 
-          {/* E) TYPOGRAPHY SECTION */}
           <section>
             <SectionLabel>Typography</SectionLabel>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -177,7 +190,6 @@ export default function KitResult({ kit: initialKit }) {
             </p>
           </section>
 
-          {/* F) LANDING PAGE COPY */}
           <section>
             <SectionLabel>Landing Page Copy</SectionLabel>
             <div className="space-y-4">
@@ -197,7 +209,6 @@ export default function KitResult({ kit: initialKit }) {
             </div>
           </section>
 
-          {/* G) TWITTER THREAD */}
           <section>
             <SectionLabel>Twitter Thread</SectionLabel>
             <div className="space-y-4">
@@ -225,7 +236,6 @@ export default function KitResult({ kit: initialKit }) {
             </div>
           </section>
 
-          {/* H) PRODUCT HUNT */}
           <section>
             <SectionLabel>Product Hunt</SectionLabel>
             <div className="grid grid-cols-1 gap-4">
@@ -250,7 +260,6 @@ export default function KitResult({ kit: initialKit }) {
             </div>
           </section>
 
-          {/* I) PRICING TIERS */}
           <section>
             <SectionLabel>Pricing Copy</SectionLabel>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -268,7 +277,6 @@ export default function KitResult({ kit: initialKit }) {
 
           <Separator className="bg-border/50" />
 
-          {/* I) SHARE & ACTIONS */}
           <div className="flex flex-col gap-3 pt-4">
             {kit.isPublic && (
               <Button 
@@ -291,14 +299,16 @@ export default function KitResult({ kit: initialKit }) {
             </Button>
           </div>
 
-          {/* J) META INFO */}
         </div>
 
-        {/* RIGHT COLUMN - STICKY PANEL */}
         <div className="relative">
           <div className="lg:sticky lg:top-20 space-y-4">
-            <div className="bg-[#111111] border border-[#1F2937] rounded-lg p-6 space-y-6">
-              <div className="space-y-4">
+            <div className="bg-[#111111] border border-[#1F2937] rounded-lg p-6 space-y-6 overflow-hidden relative">
+              <div className="absolute -bottom-4 -right-4 w-32 h-32 opacity-[0.03] pointer-events-none rotate-12">
+                <Image src="/logo.svg" alt="" fill className="object-contain" />
+              </div>
+
+              <div className="space-y-4 relative z-10">
                 <div className="flex items-center justify-between text-sm">
                   <span className="flex items-center text-text-secondary">
                     <Eye className="w-4 h-4 mr-2 text-text-muted" />
@@ -337,11 +347,7 @@ export default function KitResult({ kit: initialKit }) {
                         label="Share link" 
                       />
                     </div>
-                    <Button 
-                      variant="outline" 
-                      onClick={handleShare}
-                      className="w-full border-border hover:bg-surface-2 text-text-primary h-9 gap-2"
-                    >
+                    <Button variant="outline" onClick={handleShare} className="w-full border-border hover:bg-surface-2 text-text-primary h-9 gap-2">
                       <Share2 className="w-4 h-4" />
                       Share Kit
                     </Button>
@@ -350,11 +356,7 @@ export default function KitResult({ kit: initialKit }) {
                   <div className="space-y-3">
                     {isOwner ? (
                       <>
-                        <Button 
-                          className="w-full bg-primary hover:bg-primary-hover text-white font-semibold"
-                          onClick={handlePublish}
-                          disabled={isPublishing}
-                        >
+                        <Button className="w-full bg-primary hover:bg-primary-hover text-white font-semibold" onClick={handlePublish} disabled={isPublishing}>
                           {isPublishing ? 'Publishing...' : 'Publish to Gallery'}
                         </Button>
                         <p className="text-[10px] text-text-muted text-center">
