@@ -9,9 +9,15 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
+import { validateEmail } from '@/lib/validation';
+import { Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({ email: '', password: '' });
+  const [errors, setErrors] = useState({});
+  const [touched, setTouched] = useState({});
+  const [isShaking, setIsShaking] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -24,8 +30,45 @@ export default function LoginPage() {
     }
   }, [status, router]);
 
+  const validateField = (name, value) => {
+    let error = null;
+    if (name === 'email') {
+      error = validateEmail(value);
+    } else if (name === 'password') {
+      if (!value) error = "Password is required";
+    }
+    setErrors(prev => ({ ...prev, [name]: error }));
+    return error;
+  };
+
+  const handleBlur = (name) => {
+    setTouched(prev => ({ ...prev, [name]: true }));
+    validateField(name, formData[name]);
+  };
+
+  const handleChange = (name, value) => {
+    setFormData(prev => ({ ...prev, [name]: value }));
+    if (touched[name]) {
+      validateField(name, value);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    const emailError = validateEmail(formData.email);
+    const passwordError = formData.password ? null : "Password is required";
+
+    const newErrors = { email: emailError, password: passwordError };
+    setErrors(newErrors);
+    setTouched({ email: true, password: true });
+
+    if (emailError || passwordError) {
+      setIsShaking(true);
+      setTimeout(() => setIsShaking(false), 500);
+      return;
+    }
+
     setIsLoading(true);
 
     try {
@@ -42,8 +85,10 @@ export default function LoginPage() {
       toast.success('Welcome back!');
       router.push(callbackUrl);
       router.refresh();
-    } catch (error) {
+    } catch (error) { 
       toast.error(error.message);
+      setIsShaking(true);
+      setTimeout(() => setIsShaking(false), 500);
     } finally {
       setIsLoading(false);
     }
@@ -54,6 +99,53 @@ export default function LoginPage() {
   };
 
   if (status === 'loading' || status === 'authenticated') return null;
+
+  const renderField = (name, label, type = 'text', placeholder = '') => {
+    const error = errors[name];
+    const isTouched = touched[name];
+    const isValid = isTouched && !error && formData[name] !== '';
+    const isInvalid = isTouched && error;
+
+    return (
+      <div className="space-y-2">
+        <div className="flex justify-between items-center">
+          <label className="text-[10px] font-medium text-text-secondary uppercase tracking-widest" htmlFor={name}>
+            {label}
+          </label>
+          {isValid && <CheckCircle2 className="w-3 h-3 text-success" />}
+        </div>
+        <div className="relative">
+          <Input
+            id={name}
+            type={type}
+            placeholder={placeholder}
+            value={formData[name]}
+            onChange={(e) => handleChange(name, e.target.value)}
+            onBlur={() => handleBlur(name)}
+            className={cn(
+              "bg-surface-3 border-border focus:border-primary/50 h-11 transition-all duration-200",
+              isInvalid && "border-error focus:border-error ring-error/20",
+              isValid && "border-success focus:border-success ring-success/20",
+              isInvalid && isShaking && "animate-shake"
+            )}
+            disabled={isLoading}
+            aria-invalid={isInvalid ? "true" : "false"}
+            aria-describedby={isInvalid ? `${name}-error` : undefined}
+          />
+          {isInvalid && (
+            <div className="absolute right-3 top-1/2 -translate-y-1/2">
+              <AlertCircle className="w-4 h-4 text-error" />
+            </div>
+          )}
+        </div>
+        {isInvalid && (
+          <p id={`${name}-error`} className="text-[11px] text-error font-medium animate-fadeIn">
+            {error}
+          </p>
+        )}
+      </div>
+    );
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#0A0A0A] p-4">
@@ -107,39 +199,21 @@ export default function LoginPage() {
               </span>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <label className="text-[10px] font-medium text-text-secondary uppercase tracking-widest">Email Address</label>
-                <Input
-                  type="email"
-                  placeholder="name@example.com"
-                  required
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="bg-surface-3 border-border focus:border-primary/50 h-11"
-                  disabled={isLoading}
-                />
-              </div>
-              <div className="space-y-2">
-                <div className="flex justify-between items-center">
-                  <label className="text-[10px] font-medium text-text-secondary uppercase tracking-widest">Password</label>
-                </div>
-                <Input
-                  type="password"
-                  placeholder="••••••••"
-                  required
-                  value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className="bg-surface-3 border-border focus:border-primary/50 h-11"
-                  disabled={isLoading}
-                />
-              </div>
+            <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+              {renderField('email', 'Email Address', 'email', 'name@example.com')}
+              {renderField('password', 'Password', 'password', '••••••••')}
+              
               <Button 
                 type="submit" 
-                className="w-full bg-primary hover:bg-primary-hover text-white font-bold h-11"
+                className="w-full bg-primary hover:bg-primary-hover text-white font-bold h-11 flex items-center justify-center gap-2"
                 disabled={isLoading}
               >
-                {isLoading ? 'Signing in...' : 'Sign in'}
+                {isLoading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>Signing in...</span>
+                  </>
+                ) : 'Sign in'}
               </Button>
             </form>
           </CardContent>
