@@ -38,7 +38,6 @@ export async function GET(req) {
       totalPages: Math.ceil(totalCount / limit)
     });
   } catch (error) {
-    console.error("Gallery fetch error:", error);
     return NextResponse.json({ error: "Failed to fetch kits" }, { status: 500 });
   }
 }
@@ -73,7 +72,6 @@ export async function POST(req) {
 
     return NextResponse.json({ error: "Invalid action" }, { status: 400 });
   } catch (error) {
-    console.error("Publish kit error:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
