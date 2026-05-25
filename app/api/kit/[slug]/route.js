@@ -23,7 +23,6 @@ export async function GET(req, { params }) {
 
     return NextResponse.json(kit);
   } catch (error) {
-    console.error("Fetch kit error:", error);
     return NextResponse.json({ error: "Something went wrong" }, { status: 500 });
   }
 }
@@ -53,7 +52,6 @@ export async function DELETE(req, { params }) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Delete kit error:", error);
     return NextResponse.json({ error: "Something went wrong" }, { status: 500 });
   }
 }
