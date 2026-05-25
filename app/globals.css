@@ -99,6 +99,31 @@ body {
   100% { opacity: 0.2; transform: scale(1); }
 }
 
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+
+.animate-shake {
+  animation: shake 0.2s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+@keyframes unlimited-glow {
+  0%, 100% { 
+    box-shadow: 0 0 5px rgba(22, 163, 74, 0.2);
+    border-color: rgba(74, 222, 128, 0.2);
+  }
+  50% { 
+    box-shadow: 0 0 15px rgba(22, 163, 74, 0.4);
+    border-color: rgba(74, 222, 128, 0.5);
+  }
+}
+
+.animate-unlimited-glow {
+  animation: unlimited-glow 2s ease-in-out infinite;
+}
+
 @keyframes gradient-shift {
   0% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
