@@ -29,9 +29,22 @@ const CopyIcon = ({ text, label }) => {
   );
 };
 
-const SectionLabel = ({ children }) => (
-  <p className="text-xs font-500 text-[#6B7280] uppercase tracking-widest mb-3">{children}</p>
-);
+const SectionLabel = ({ children, blockKey }) => (
+    <div className="flex items-center justify-between mb-3">
+      <p className="text-xs font-500 text-[#6B7280] uppercase tracking-widest">{children}</p>
+      {isPro && isOwner && blockKey && (
+        <button 
+          onClick={() => handleRefreshBlock(blockKey)}
+          disabled={refreshingBlocks[blockKey]}
+          className="flex items-center gap-1.5 text-[10px] font-medium text-primary hover:text-primary-hover transition-colors disabled:opacity-50"
+          title="Refresh this block"
+        >
+          <RefreshCcw className={cn("w-3 h-3", refreshingBlocks[blockKey] && "animate-spin")} />
+          {refreshingBlocks[blockKey] ? 'Refreshing...' : 'Refresh'}
+        </button>
+      )}
+    </div>
+  );
 
 export default function KitResult({ kit: initialKit }) {
   const { data: session } = useSession();
@@ -160,7 +173,7 @@ export default function KitResult({ kit: initialKit }) {
           </section>
 
           <section>
-            <SectionLabel>Brand Names</SectionLabel>
+            <SectionLabel blockKey="brandNames">Brand Names</SectionLabel>
             <div className="flex flex-wrap gap-3">
               {kit.brandNames.map((bn, i) => (
                 <div 
@@ -183,7 +196,7 @@ export default function KitResult({ kit: initialKit }) {
           </section>
 
           <section>
-            <SectionLabel>Tagline</SectionLabel>
+            <SectionLabel blockKey="tagline">Tagline</SectionLabel>
             <div className="bg-surface border border-border rounded-md p-6 relative">
               <div className="absolute top-4 right-4">
                 <CopyIcon text={kit.tagline} label="tagline" />
@@ -195,12 +208,12 @@ export default function KitResult({ kit: initialKit }) {
           </section>
 
           <section>
-            <SectionLabel>Color Palette</SectionLabel>
+            <SectionLabel blockKey="colors">Color Palette</SectionLabel>
             <ColorSwatch colors={kit.colors} />
           </section>
 
           <section>
-            <SectionLabel>Typography</SectionLabel>
+            <SectionLabel blockKey="fonts">Typography</SectionLabel>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="bg-surface border border-border rounded-md p-5">
                 <p className="text-[10px] text-text-muted uppercase mb-4">Heading Font</p>
@@ -223,7 +236,7 @@ export default function KitResult({ kit: initialKit }) {
           </section>
 
           <section>
-            <SectionLabel>Landing Page Copy</SectionLabel>
+            <SectionLabel blockKey="landingCopy">Landing Page Copy</SectionLabel>
             <div className="space-y-4">
               {[
                 { label: 'Hero Headline', value: kit?.landingCopy?.hero },
@@ -242,7 +255,7 @@ export default function KitResult({ kit: initialKit }) {
           </section>
 
           <section>
-            <SectionLabel>Twitter Thread</SectionLabel>
+            <SectionLabel blockKey="twitterThread">Twitter Thread</SectionLabel>
             <div className="space-y-4">
               {kit?.twitterThread?.map((tweet, i) => (
                 <div key={i} className="bg-surface border border-border rounded-md p-5 relative">
@@ -269,7 +282,7 @@ export default function KitResult({ kit: initialKit }) {
           </section>
 
           <section>
-            <SectionLabel>Product Hunt</SectionLabel>
+            <SectionLabel blockKey="productHunt">Product Hunt</SectionLabel>
             <div className="grid grid-cols-1 gap-4">
               <div className="bg-surface border border-border rounded-md p-5 relative">
                 <div className="absolute top-4 right-4">
@@ -293,7 +306,7 @@ export default function KitResult({ kit: initialKit }) {
           </section>
 
           <section>
-            <SectionLabel>Pricing Copy</SectionLabel>
+            <SectionLabel blockKey="pricingCopy">Pricing Copy</SectionLabel>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {[kit?.pricingCopy?.tier1, kit?.pricingCopy?.tier2, kit?.pricingCopy?.tier3].map((tier, i) => (
                 <div key={i} className="bg-surface border border-border rounded-md p-5 relative flex flex-col justify-center">
