@@ -18,7 +18,15 @@ export default function IdeaForm() {
   const { data: session, update } = useSession();
   const [idea, setIdea] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isIllusionComplete, setIsIllusionComplete] = useState(false);
+  const [generatedSlug, setGeneratedSlug] = useState(null);
   const router = useRouter();
+
+  useEffect(() => {
+    if (isIllusionComplete && generatedSlug) {
+      router.push(`/kit/${generatedSlug}`);
+    }
+  }, [isIllusionComplete, generatedSlug, router]);
 
   useEffect(() => {
     const hasVisited = sessionStorage.getItem('kitmint_visited');
@@ -30,7 +38,7 @@ export default function IdeaForm() {
     }
   }, []);
 
-  const maxLength = 280;
+  const maxLength = 1000;
   const remainingChars = maxLength - idea.length;
 
   const handleSubmit = async (e) => {
@@ -41,6 +49,9 @@ export default function IdeaForm() {
     }
 
     setIsGenerating(true);
+    setIsIllusionComplete(false);
+    setGeneratedSlug(null);
+
     try {
       const res = await fetch('/api/generate-kit', {
         method: 'POST',
@@ -51,6 +62,7 @@ export default function IdeaForm() {
       const data = await res.json();
 
       if (!res.ok) {
+        setIsGenerating(false);
         if (data.error === 'GUEST_LIMIT_REACHED') {
           toast.info('Create a free account to generate more kits');
           setTimeout(() => router.push('/signup'), 1500);
@@ -70,18 +82,21 @@ export default function IdeaForm() {
         });
       }
 
-      toast.success('Kit generated successfully!');
-      router.push(`/kit/${data.slug}`);
+      // We have the slug, but we don't navigate yet. 
+      // The LoadingSteps will trigger onComplete which sets isIllusionComplete to true.
+      setGeneratedSlug(data.slug);
     } catch (error) {
-      toast.error(error.message);
-    } finally {
       setIsGenerating(false);
+      toast.error(error.message);
     }
   };
 
   return (
     <>
-      <LoadingSteps isGenerating={isGenerating} />
+      <LoadingSteps 
+        isGenerating={isGenerating} 
+        onComplete={() => setIsIllusionComplete(true)} 
+      />
       
       <div className="w-full max-w-2xl mx-auto animate-fade-in">
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -89,13 +104,13 @@ export default function IdeaForm() {
             <div className={`absolute -inset-1 rounded-xl blur-md opacity-0 group-focus-within:opacity-100 transition duration-1000 ${isGenerating ? '' : 'animate-multi-color-glow'}`}></div>
             <div className="relative">
               <Textarea
-                placeholder="A platform for sustainable fashion swaps..."
-                className="min-h-[140px] bg-surface-3 border-border focus:border-white/20 focus:ring-0 text-text-primary resize-none p-5 rounded-lg transition-all duration-300 placeholder:text-text-muted/50"
+                placeholder="Describe your project, tech stack, and goals in detail..."
+                className="min-h-[180px] bg-surface-3 border-border focus:border-white/20 focus:ring-0 text-text-primary resize-none p-5 rounded-lg transition-all duration-300 placeholder:text-text-muted/50"
                 value={idea}
                 onChange={(e) => setIdea(e.target.value.slice(0, maxLength))}
                 disabled={isGenerating}
               />
-              <div className={`absolute bottom-3 right-3 text-[10px] font-mono tracking-widest ${remainingChars < 20 ? 'text-error' : 'text-text-muted'}`}>
+              <div className={`absolute bottom-3 right-3 text-[10px] font-mono tracking-widest ${remainingChars < 50 ? 'text-error' : 'text-text-muted'}`}>
                 {remainingChars} / {maxLength}
               </div>
             </div>
