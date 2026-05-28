@@ -700,6 +700,73 @@ export default function KitResult({ kit: initialKit }) {
                         </div>
                     </section>
 
+                    {/* NEW: MARKETING & SEO */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        {kit?.marketingStrategy && (
+                            <section className={cn("transition-opacity", refreshingBlocks.marketingStrategy && "opacity-50")}>
+                                <SectionLabel blockKey="marketingStrategy">Marketing Strategy</SectionLabel>
+                                <div className="bg-surface border border-border rounded-xl p-6 space-y-4">
+                                    {kit.marketingStrategy.map((strat, i) => (
+                                        <div key={i} className="flex gap-3">
+                                            <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
+                                                <span className="text-[10px] font-bold text-primary">{i+1}</span>
+                                            </div>
+                                            <p className="text-sm text-text-secondary leading-relaxed">{strat}</p>
+                                        </div>
+                                    ))}
+                                </div>
+                            </section>
+                        )}
+                        {kit?.growthHacks && (
+                            <section className={cn("transition-opacity", refreshingBlocks.growthHacks && "opacity-50")}>
+                                <SectionLabel blockKey="growthHacks">Growth Hacks</SectionLabel>
+                                <div className="bg-surface border border-border rounded-xl p-6 space-y-4">
+                                    {kit.growthHacks.map((hack, i) => (
+                                        <div key={i} className="flex gap-3">
+                                            <Sparkles className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                                            <p className="text-sm text-text-secondary leading-relaxed">{hack}</p>
+                                        </div>
+                                    ))}
+                                </div>
+                            </section>
+                        )}
+                    </div>
+
+                    {kit?.seoKeywords && (
+                        <section className={cn("transition-opacity", refreshingBlocks.seoKeywords && "opacity-50")}>
+                            <SectionLabel blockKey="seoKeywords">SEO Keywords</SectionLabel>
+                            <div className="bg-surface border border-border rounded-xl p-6 flex flex-wrap gap-2">
+                                {kit.seoKeywords.map((keyword, i) => (
+                                    <Badge key={i} variant="outline" className="bg-surface-2 border-border text-text-secondary px-3 py-1">
+                                        {keyword}
+                                    </Badge>
+                                ))}
+                            </div>
+                        </section>
+                    )}
+
+                    {kit?.brandVoice && (
+                        <section className={cn("transition-opacity", refreshingBlocks.brandVoice && "opacity-50")}>
+                            <SectionLabel blockKey="brandVoice">Brand Voice & Tone</SectionLabel>
+                            <div className="bg-surface border border-border rounded-xl p-6 grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                <div className="space-y-4">
+                                    <div>
+                                        <p className="text-[10px] text-text-muted uppercase font-bold mb-1">Tone</p>
+                                        <p className="text-sm text-text-primary">{kit.brandVoice.tone}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-[10px] text-text-muted uppercase font-bold mb-1">Style</p>
+                                        <p className="text-sm text-text-primary">{kit.brandVoice.style}</p>
+                                    </div>
+                                </div>
+                                <div className="bg-surface-2 rounded-lg p-4 border border-border/50 italic">
+                                    <p className="text-[10px] text-text-muted uppercase font-bold mb-2 not-italic">Example</p>
+                                    <p className="text-sm text-text-secondary">"{kit.brandVoice.example}"</p>
+                                </div>
+                            </div>
+                        </section>
+                    )}
+
                     <Separator className="bg-border/50" />
 
                     <div className="flex flex-col gap-3 pt-4">
