@@ -19,6 +19,9 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata = {
   title: "KitMint",
   description: "Turn an idea into a brand in 60 seconds",
+  verification: {
+    google: "K-xkYw1Y1PqYEcOS3grjVfobh5EH_UFVzU8jESjBzKg",
+  },
   icons: {
     icon: [
       { url: '/favicon.svg', type: 'image/svg+xml' },
