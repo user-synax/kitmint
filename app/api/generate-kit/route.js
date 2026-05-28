@@ -54,7 +54,9 @@ export async function POST(req) {
     }
 
     // 3. VALIDATE INPUT
-    const { idea } = await req.json();
+    const details = await req.json();
+    const { idea } = details;
+    
     if (!idea || idea.trim().length < 10) {
       return NextResponse.json({ error: "Idea must be at least 10 characters" }, { status: 400 });
     }
@@ -65,7 +67,7 @@ export async function POST(req) {
     // 4. GENERATE WITH GROQ
     const completion = await groq.chat.completions.create({
       model: "llama-3.3-70b-versatile",
-      messages: buildKitPrompt(idea),
+      messages: buildKitPrompt(details),
       temperature: 0.8,
       max_tokens: 2000,
       response_format: { type: "json_object" },
@@ -99,7 +101,11 @@ export async function POST(req) {
         instagram: parsedKit.instagramBio || "Transforming how you think about " + idea + " 🚀", 
         tiktok: parsedKit.tiktokBio || "The future of " + idea + " is here. ⚡", 
         twitter: parsedKit.twitterBio || "Building the next generation of " + idea + ". Join us! 🚀" 
-      }
+      },
+      marketingStrategy: parsedKit.marketingStrategy || [],
+      seoKeywords: parsedKit.seoKeywords || [],
+      growthHacks: parsedKit.growthHacks || [],
+      brandVoice: parsedKit.brandVoice || { tone: "Professional", style: "Clear", example: "We help you grow." }
     };
 
     const newKit = new Kit({
@@ -107,6 +113,16 @@ export async function POST(req) {
       userId: session?.user?.id || null,
       isPublic: false,
       ideaPrompt: idea,
+      metadata: {
+        projectType: details.projectType,
+        techStack: details.techStack,
+        scalability: details.scalability,
+        deployment: details.deployment,
+        features: details.features,
+        budget: details.budget,
+        timeline: details.timeline,
+        integrations: details.integrations
+      },
       ...finalKitData
     });
     await newKit.save();
