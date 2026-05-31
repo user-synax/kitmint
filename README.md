@@ -5,9 +5,9 @@
 
 **Turn an idea into a brand in 60 seconds.**
 
-[![Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge\&logo=vercel)](https://kitmint.vercel.app)
-[![Next.js](https://img.shields.io/badge/Next.js-15-black?style=for-the-badge\&logo=next.js)](https://nextjs.org)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4-black?style=for-the-badge\&logo=tailwind-css)](https://tailwindcss.com)
+[![Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://kitmint.vercel.app)
+[![Next.js](https://img.shields.io/badge/Next.js-16-black?style=for-the-badge&logo=next.js)](https://nextjs.org)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4-black?style=for-the-badge&logo=tailwind-css)](https://tailwindcss.com)
 [![License](https://img.shields.io/badge/License-MIT-black?style=for-the-badge)](LICENSE)
 
 ### 🚀 Describe your startup. Get brand names, colors, copy, and a launch kit.
@@ -29,6 +29,7 @@ KitMint leverages AI to provide a comprehensive brand identity and launch strate
 - **📊 Interactive Dashboard**: Manage all your generated kits, track views, and toggle privacy settings.
 - **🌐 Community Gallery**: Discover and get inspired by brand kits created by the community.
 - **📱 Fully Responsive**: Optimized for seamless use across mobile, tablet, and desktop devices.
+- **💀 Skeleton Loading**: Smooth skeleton UI during kit generation, preventing layout shift and improving UX.
 
 ***
 
@@ -47,7 +48,7 @@ KitMint leverages AI to provide a comprehensive brand identity and launch strate
 
 ## 🛠️ Tech Stack
 
-- **Framework**: [Next.js 15 (App Router)](https://nextjs.org)
+- **Framework**: [Next.js 16 (App Router)](https://nextjs.org)
 - **Styling**: [Tailwind CSS](https://tailwindcss.com)
 - **AI Engine**: [Groq SDK](https://groq.com)
 - **Database**: [MongoDB](https://www.mongodb.com) with [Mongoose](https://mongoosejs.com)
